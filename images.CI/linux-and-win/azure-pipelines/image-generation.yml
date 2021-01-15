@@ -9,7 +9,8 @@ jobs:
   displayName: Image Generation (${{ parameters.image_type }})
   timeoutInMinutes: 600
   cancelTimeoutInMinutes: 30
-  pool: windows-latest
+  pool: 
+    vmImage: 'windows-latest'
   variables:
   - group: Image Generation Variables
 
