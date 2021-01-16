@@ -207,19 +207,13 @@
     },
     "docker": {
         "images": [
-            "alpine:3.7",
-            "alpine:3.8",
             "alpine:3.9",
             "alpine:3.10",
-            "buildpack-deps:stretch",
-            "buildpack-deps:buster",
-            "debian:8",
-            "debian:9",
             "jekyll/builder",
             "mcr.microsoft.com/azure-pipelines/node8-typescript",
-            "node:10",
+            "mcr.microsoft.com/dotnet/core/sdk:3.1-alpine",
+            "mcr.microsoft.com/dotnet/core/sdk:5.0-alpine",
             "node:12",
-            "node:10-alpine",
             "node:12-alpine",
             "ubuntu:14.04"
         ]
@@ -241,7 +235,6 @@
             "dotnet-sdk-5.0"
         ],
         "versions": [
-            "2.1",
             "3.0",
             "3.1",
             "5.0"
@@ -272,10 +265,6 @@
     },
     "php": {
         "versions": [
-            "7.1",
-            "7.2",
-            "7.3",
-            "7.4",
             "8.0"
         ]
     }

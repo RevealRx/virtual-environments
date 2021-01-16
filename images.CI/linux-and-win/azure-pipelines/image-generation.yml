@@ -79,6 +79,7 @@ jobs:
     inputs:
       targetType: filePath
       filePath: ./images.CI/linux-and-win/create-release.ps1
+      errorActionPreference: continue
       arguments: -BuildId $(Build.BuildId) `
                         -Organization $(RELEASE_TARGET_ORGANIZATION) `
                         -DefinitionId $(RELEASE_TARGET_DEFINITION_ID) `
