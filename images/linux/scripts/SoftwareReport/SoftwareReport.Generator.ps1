@@ -35,7 +35,6 @@ $markdown += New-MDHeader "Language and Runtime" -Level 3
 $markdown += New-MDList -Style Unordered -Lines (@(
         (Get-BashVersion),
         (Get-CPPVersions),
-        (Get-FortranVersions),
         (Get-ClangVersions),
         (Get-ErlangVersion),
         (Get-MonoVersion),
@@ -141,7 +140,6 @@ $markdown += New-MDList -Style Unordered -Lines ($toolsList | Sort-Object)
 
 $markdown += New-MDHeader "CLI Tools" -Level 3
 $markdown += New-MDList -Style Unordered -Lines (@(
-    (Get-AlibabaCloudCliVersion),
     (Get-AWSCliVersion),
     (Get-AWSCliSessionManagerPluginVersion),
     (Get-AWSSAMVersion),
@@ -166,10 +164,6 @@ if (Test-IsUbuntu20) {
     $markdown += Build-GraalVMTable | New-MDTable
     $markdown += New-MDNewLine
 }
-
-$markdown += New-MDHeader "PHP" -Level 3
-$markdown += Build-PHPTable | New-MDTable
-$markdown += New-MDNewLine
 
 $markdown += New-MDHeader "Haskell" -Level 3
 $markdown += New-MDList -Style Unordered -Lines (@(
@@ -242,10 +236,6 @@ $markdown += New-MDList -Lines (Get-PowershellVersion) -Style Unordered
 
 $markdown += New-MDHeader "PowerShell Modules" -Level 4
 $markdown += Get-PowerShellModules | New-MDTable
-$markdown += New-MDNewLine
-
-$markdown += New-MDHeader "Android" -Level 3
-$markdown += Build-AndroidTable | New-MDTable
 $markdown += New-MDNewLine
 
 $markdown += New-MDHeader "Cached Docker images" -Level 3
