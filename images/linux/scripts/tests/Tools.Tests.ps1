@@ -135,18 +135,6 @@ Describe "gcc" {
     }
 }
 
-Describe "gfortran" {
-    [array]$testCases = (Get-ToolsetContent).gfortran.Versions | ForEach-Object { @{GfortranVersion = $_} }
-
-    It "gfortran <GfortranVersion>" -TestCases $testCases {
-        param (
-            [string] $GfortranVersion
-        )
-
-        "$GfortranVersion --version" | Should -ReturnZeroExitCode
-    }
-}
-
 Describe "Mono" {
     It "mono" {
         "mono --version" | Should -ReturnZeroExitCode
