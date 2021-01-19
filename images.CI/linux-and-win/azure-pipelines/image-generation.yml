@@ -33,8 +33,14 @@ jobs:
         $TemplateDirectoryName = if ($ImageType.StartsWith("ubuntu")) { "linux" } else { "win" }
         $TemplateDirectoryPath = Join-Path "images" $TemplateDirectoryName | Resolve-Path
         $TemplatePath = Join-Path $TemplateDirectoryPath "$ImageType.json"
+        $ManagedImageName = "agent-$ImageType-$(Build.BuildId)"
+
+        Write-Host "Managed Image Name: $ManagedImageName"
+        Write-Host "Template Path: $TemplatePath"
+
         Write-Host "##vso[task.setvariable variable=TemplateDirectoryPath;]$TemplateDirectoryPath"
         Write-Host "##vso[task.setvariable variable=TemplatePath;]$TemplatePath"
+        Write-Host "##vso[task.setvariable variable=ManagedImageName;]$ManagedImageName"
 
   - task: PowerShell@2
     displayName: 'Build VM'
@@ -46,7 +52,7 @@ jobs:
                         -ClientSecret $(CLIENT_SECRET) `
                         -TemplatePath $(TemplatePath) `
                         -ResourceGroup $(AZURE_RESOURCE_GROUP) `
-                        -StorageAccount $(AZURE_STORAGE_ACCOUNT) `
+                        -ManagedImageName $(ManagedImageName) `
                         -SubscriptionId $(AZURE_SUBSCRIPTION) `
                         -TenantId $(AZURE_TENANT) `
                         -Location $(AZURE_LOCATION) `

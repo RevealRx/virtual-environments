@@ -6,7 +6,7 @@ param(
     [String] [Parameter (Mandatory=$true)] $ResourcesNamePrefix,
     [String] [Parameter (Mandatory=$true)] $Location,
     [String] [Parameter (Mandatory=$true)] $ResourceGroup,
-    [String] [Parameter (Mandatory=$true)] $StorageAccount,
+    [String] [Parameter (Mandatory=$true)] $ManagedImageName,
     [String] [Parameter (Mandatory=$true)] $SubscriptionId,
     [String] [Parameter (Mandatory=$true)] $TenantId,
     [String] [Parameter (Mandatory=$true)] $VirtualNetworkName,
@@ -47,7 +47,7 @@ packer build    -var "capture_name_prefix=$ResourcesNamePrefix" `
                 -var "github_feed_token=$GitHubFeedToken" `
                 -var "location=$Location" `
                 -var "resource_group=$ResourceGroup" `
-                -var "storage_account=$StorageAccount" `
+                -var "managed_image_name=$ManagedImageName" `
                 -var "subscription_id=$SubscriptionId" `
                 -var "temp_resource_group_name=$TempResourceGroupName" `
                 -var "tenant_id=$TenantId" `
