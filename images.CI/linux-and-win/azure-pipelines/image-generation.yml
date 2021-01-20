@@ -80,18 +80,16 @@ jobs:
                         -PrefixToPathTrim "$(TemplateDirectoryPath)" `
                         -PrintTopNLongest 25
 
-  - task: PowerShell@2
-    displayName: 'Create release for VM deployment'
+  - task: AzureCLI@2
+    displayName: 'Update VMSS Deployment'
     inputs:
-      targetType: filePath
-      filePath: ./images.CI/linux-and-win/create-release.ps1
-      errorActionPreference: continue
-      arguments: -BuildId $(Build.BuildId) `
-                        -Organization $(RELEASE_TARGET_ORGANIZATION) `
-                        -DefinitionId $(RELEASE_TARGET_DEFINITION_ID) `
-                        -Project $(RELEASE_TARGET_PROJECT) `
-                        -ImageName ${{ parameters.image_type }} `
-                        -AccessToken $(RELEASE_TARGET_TOKEN)
+      azureSubscription: $(TARGET_SUBSCRIPTION_NAME)
+      scriptType: 'pscore'
+      scriptLocation: 'scriptPath'
+      scriptPath: ./images.CI/linux-and-win/update-scaleset.ps1
+      arguments: -ImageName $(ManagedImageName) `
+                 -ResourceGroupName $(TARGET_VMSS_RESOURCE_GROUP) `
+                 -VmssName $(TARGET_VMSS_NAME)
 
   - task: PowerShell@2
     displayName: 'Clean up resources'
