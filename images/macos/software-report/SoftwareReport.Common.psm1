@@ -1,5 +1,3 @@
-Import-Module "$PSScriptRoot/../helpers/SoftwareReport.Helpers.psm1" -DisableNameChecking
-
 function Get-BashVersion {
     $version = bash -c 'echo ${BASH_VERSION}'
     return "Bash $version"
@@ -82,7 +80,7 @@ function Get-VcpkgVersion {
 }
 
 function Get-GccVersion {
-    $versionList = @("8", "9", "10")
+    $versionList = Get-ToolsetValue -KeyPath gcc.versions
     $versionList | Foreach-Object {
         $version = Run-Command "gcc-${_} --version" | Select-Object -First 1
         "$version - available by ``gcc-${_}`` alias"
@@ -90,10 +88,10 @@ function Get-GccVersion {
 }
 
 function Get-FortranVersion {
-    $versionList = @("8", "9", "10")
+    $versionList = Get-ToolsetValue -KeyPath gcc.versions
     $versionList | Foreach-Object {
         $version = Run-Command "gfortran-${_} --version" | Select-Object -First 1
-        "$version  - available by ``gfortran-${_}`` alias"
+        "$version - available by ``gfortran-${_}`` alias"
     }
 }
 
@@ -156,6 +154,14 @@ function Build-OSInfoSection {
 function Get-PHPVersion {
     $PHPVersion = Run-Command "php --version" | Select-Object -First 1 | Take-Part -Part 0,1
     return $PHPVersion
+}
+
+function Get-MSBuildVersion {
+    $msbuildVersion = msbuild -version | Select-Object -Last 1
+    $result = Select-String -Path (Get-Command msbuild).Source -Pattern "msbuild"
+    $result -match "(?<path>\/\S*\.dll)" | Out-Null
+    $msbuildPath = $Matches.path
+    return "MSBuild $msbuildVersion (from $msbuildPath)"
 }
 
 function Get-NodeVersion {
@@ -295,7 +301,9 @@ function Get-SVNVersion {
 }
 
 function Get-PackerVersion {
-    $packerVersion = Run-Command "packer --version"
+    # Packer 1.7.1 has a bug and outputs version to stderr instead of stdout https://github.com/hashicorp/packer/issues/10855
+    $result = Run-Command -Command "packer --version"
+    $packerVersion = [regex]::matches($result, "(\d+.){2}\d+").Value
     return "Packer $packerVersion"
 }
 
@@ -459,6 +467,11 @@ function Get-StackVersion {
     return "Stack $stackVersion"
 }
 
+function Get-SwiftFormatVersion {
+    $swiftFormatVersion = Run-Command "swiftformat --version"
+    return "SwiftFormat $swiftFormatVersion"
+}
+
 function Get-YamllintVersion {
     $yamllintVersion = Run-Command "yamllint --version"
     return $yamllintVersion
@@ -472,4 +485,22 @@ function Get-SwiftLintVersion {
 function Get-PowershellVersion {
     $powershellVersion = Run-Command "powershell --version"
     return $powershellVersion
+}
+
+function Build-PackageManagementEnvironmentTable {
+    return @(
+        @{
+            "Name" = "CONDA"
+            "Value" = $env:CONDA
+        },
+        @{
+            "Name" = "VCPKG_INSTALLATION_ROOT"
+            "Value" = $env:VCPKG_INSTALLATION_ROOT
+        }
+    ) | ForEach-Object {
+        [PSCustomObject] @{
+            "Name" = $_.Name
+            "Value" = $_.Value
+        }
+    }
 }

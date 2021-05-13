@@ -12,6 +12,7 @@
         "virtual_network_resource_group_name": "{{env `VNET_RESOURCE_GROUP`}}",
         "virtual_network_subnet_name": "{{env `VNET_SUBNET`}}",
         "private_virtual_network_with_public_ip": "{{env `PRIVATE_VIRTUAL_NETWORK_WITH_PUBLIC_IP`}}",
+        "allowed_inbound_ip_addresses": "{{env `AGENT_IP`}}",
         "image_folder": "/imagegeneration",
         "imagedata_file": "/imagegeneration/imagedata.json",
         "installer_script_folder": "/imagegeneration/installers",
@@ -20,7 +21,9 @@
         "capture_name_prefix": "packer",
         "image_version": "dev",
         "image_os": "ubuntu18",
-        "run_validation_diskspace": "false"
+        "run_validation_diskspace": "false",
+        "dockerhub_login": "{{env `DOCKERHUB_LOGIN`}}",
+        "dockerhub_password": "{{env `DOCKERHUB_PASSWORD`}}"
     },
     "sensitive-variables": [
         "client_secret"
@@ -41,6 +44,7 @@
             "virtual_network_resource_group_name": "{{user `virtual_network_resource_group_name`}}",
             "virtual_network_subnet_name": "{{user `virtual_network_subnet_name`}}",
             "private_virtual_network_with_public_ip": "{{user `private_virtual_network_with_public_ip`}}",
+            "allowed_inbound_ip_addresses": "{{user `allowed_inbound_ip_addresses`}}",
             "os_type": "Linux",
             "image_publisher": "Canonical",
             "image_offer": "UbuntuServer",
@@ -170,20 +174,32 @@
         {
             "type": "shell",
             "scripts": [
-                "{{template_dir}}/scripts/installers/ansible.sh",
+                "{{template_dir}}/scripts/installers/docker-compose.sh",
+                "{{template_dir}}/scripts/installers/docker-moby.sh"
+            ],
+            "environment_vars": [
+                "HELPER_SCRIPTS={{user `helper_script_folder`}}",
+                "INSTALLER_SCRIPT_FOLDER={{user `installer_script_folder`}}",
+                "DOCKERHUB_LOGIN={{user `dockerhub_login`}}",
+                "DOCKERHUB_PASSWORD={{user `dockerhub_password`}}"
+            ],
+            "execute_command": "sudo sh -c '{{ .Vars }} {{ .Path }}'"
+        },
+        {
+            "type": "shell",
+            "scripts": [
                 "{{template_dir}}/scripts/installers/azcopy.sh",
                 "{{template_dir}}/scripts/installers/azure-cli.sh",
                 "{{template_dir}}/scripts/installers/azure-devops-cli.sh",
                 "{{template_dir}}/scripts/installers/basic.sh",
                 "{{template_dir}}/scripts/installers/aliyun-cli.sh",
+                "{{template_dir}}/scripts/installers/apache.sh",
                 "{{template_dir}}/scripts/installers/aws.sh",
                 "{{template_dir}}/scripts/installers/clang.sh",
                 "{{template_dir}}/scripts/installers/swift.sh",
                 "{{template_dir}}/scripts/installers/cmake.sh",
                 "{{template_dir}}/scripts/installers/codeql-bundle.sh",
                 "{{template_dir}}/scripts/installers/containers.sh",
-                "{{template_dir}}/scripts/installers/docker-compose.sh",
-                "{{template_dir}}/scripts/installers/docker-moby.sh",
                 "{{template_dir}}/scripts/installers/dotnetcore-sdk.sh",
                 "{{template_dir}}/scripts/installers/erlang.sh",
                 "{{template_dir}}/scripts/installers/firefox.sh",
@@ -204,6 +220,7 @@
                 "{{template_dir}}/scripts/installers/mono.sh",
                 "{{template_dir}}/scripts/installers/mysql.sh",
                 "{{template_dir}}/scripts/installers/mssql-cmd-tools.sh",
+                "{{template_dir}}/scripts/installers/nginx.sh",
                 "{{template_dir}}/scripts/installers/nvm.sh",
                 "{{template_dir}}/scripts/installers/nodejs.sh",
                 "{{template_dir}}/scripts/installers/bazel.sh",
@@ -220,10 +237,9 @@
                 "{{template_dir}}/scripts/installers/terraform.sh",
                 "{{template_dir}}/scripts/installers/packer.sh",
                 "{{template_dir}}/scripts/installers/vcpkg.sh",
-                "{{template_dir}}/scripts/installers/vercel.sh",
                 "{{template_dir}}/scripts/installers/dpkg-config.sh",
                 "{{template_dir}}/scripts/installers/mongodb.sh",
-                "{{template_dir}}/scripts/installers/netlify.sh",
+                "{{template_dir}}/scripts/installers/android.sh",
                 "{{template_dir}}/scripts/installers/pypy.sh",
                 "{{template_dir}}/scripts/installers/python.sh"
             ],

@@ -14,6 +14,7 @@ Import-Module "$PSScriptRoot/SoftwareReport.Java.psm1" -DisableNameChecking
 Import-Module "$PSScriptRoot/SoftwareReport.Xamarin.psm1" -DisableNameChecking
 Import-Module "$PSScriptRoot/SoftwareReport.Toolcache.psm1" -DisableNameChecking
 Import-Module "$PSScriptRoot/SoftwareReport.Browsers.psm1" -DisableNameChecking
+Import-Module "$PSScriptRoot/SoftwareReport.WebServers.psm1" -DisableNameChecking
 Import-Module "$PSScriptRoot/../helpers/SoftwareReport.Helpers.psm1"
 Import-Module "$PSScriptRoot/../helpers/Common.Helpers.psm1"
 Import-Module "$PSScriptRoot/../helpers/Xcode.Helpers.psm1"
@@ -31,6 +32,7 @@ $markdown += New-MDHeader "Installed Software" -Level 2
 $markdown += New-MDHeader "Language and Runtime" -Level 3
 $languageAndRuntimeList = @(
     (Get-BashVersion),
+    (Get-MSBuildVersion),
     (Get-NodeVersion),
     (Get-NVMVersion),
     (Get-NVMNodeVersionList),
@@ -58,7 +60,9 @@ if ($os.IsLessThanBigSur) {
     )
 }
 
-$markdown += New-MDList -Style Unordered -Lines ($languageAndRuntimeList | Sort-Object)
+# To sort GCC and Gfortran correctly, we need to use natural sort https://gist.github.com/markwragg/e2a9dc05f3464103d6998298fb575d4e#file-sort-natural-ps1
+$toNatural = { [regex]::Replace($_, '\d+', { $args[0].Value.PadLeft(20) }) }
+$markdown += New-MDList -Style Unordered -Lines ($languageAndRuntimeList | Sort-Object $toNatural)
 
 # Package Management
 $markdown += New-MDHeader "Package Management" -Level 3
@@ -85,6 +89,9 @@ if ($os.IsHigherThanMojave) {
 }
 
 $markdown += New-MDList -Style Unordered -Lines ($packageManagementList | Sort-Object)
+$markdown += New-MDHeader "Environment variables" -Level 4
+$markdown += Build-PackageManagementEnvironmentTable | New-MDTable
+$markdown += New-MDNewLine
 
 # Project Management
 $markdown += New-MDHeader "Project Management" -Level 3
@@ -160,7 +167,8 @@ if( -not $os.IsHighSierra) {
         (Get-GHCupVersion),
         (Get-GHCVersion),
         (Get-CabalVersion),
-        (Get-StackVersion)
+        (Get-StackVersion),
+        (Get-SwiftFormatVersion)
     )
 }
 
@@ -182,6 +190,9 @@ $markdown += New-MDList -Style Unordered -Lines ($lintersList | Sort-Object)
 
 $markdown += New-MDHeader "Browsers" -Level 3
 $markdown += Get-BrowserSection
+$markdown += New-MDHeader "Environment variables" -Level 4
+$markdown += Build-BrowserWebdriversEnvironmentTable | New-MDTable
+$markdown += New-MDNewLine
 
 $markdown += New-MDHeader "Java" -Level 3
 $markdown += Get-JavaVersions | New-MDTable
@@ -219,22 +230,19 @@ $markdown += New-MDHeader "PowerShell Modules" -Level 4
 $markdown += Get-PowerShellModules | New-MDTable
 $markdown += New-MDNewLine
 
+# Web Servers
+if ($os.IsHigherThanMojave) {
+    $markdown += Build-WebServersSection
+}
+
 # Xamarin section
 $markdown += New-MDHeader "Xamarin" -Level 3
 $markdown += New-MDHeader "Visual Studio for Mac" -Level 4
 $markdown += New-MDList -Lines @(Get-VSMacVersion) -Style Unordered
 
-$markdown += New-MDHeader "Mono" -Level 4
-$markdown += New-MDList -Lines (Build-MonoList) -Style Unordered
-
-$markdown += New-MDHeader "Xamarin.iOS" -Level 4
-$markdown += New-MDList -Lines (Build-XamarinIOSList) -Style Unordered
-
-$markdown += New-MDHeader "Xamarin.Mac" -Level 4
-$markdown += New-MDList -Lines (Build-XamarinMacList) -Style Unordered
-
-$markdown += New-MDHeader "Xamarin.Android" -Level 4
-$markdown += New-MDList -Lines (Build-XamarinAndroidList) -Style Unordered
+$markdown += New-MDHeader "Xamarin bundles" -Level 4
+$markdown += Build-XamarinTable | New-MDTable
+$markdown += New-MDNewLine
 
 $markdown += New-MDHeader "Unit Test Framework" -Level 4
 $markdown += New-MDList -Lines @(Get-NUnitVersion) -Style Unordered
@@ -260,6 +268,9 @@ $markdown += New-MDNewLine
 # Android section
 $markdown += New-MDHeader "Android" -Level 3
 $markdown += Build-AndroidTable | New-MDTable
+$markdown += New-MDNewLine
+$markdown += New-MDHeader "Environment variables" -Level 4
+$markdown += Build-AndroidEnvironmentTable | New-MDTable
 $markdown += New-MDNewLine
 
 #
