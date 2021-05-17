@@ -1,7 +1,7 @@
 param(
-    [String] [Parameter (Mandatory)] $ImageName,
-    [String] [Parameter (Mandatory)] $ResourceGroupName,
-    [String] [Parameter (Mandatory)] $VmssName
+  [String] [Parameter (Mandatory)] $ImageName,
+  [String] [Parameter (Mandatory)] $ResourceGroupName,
+  [String] [Parameter (Mandatory)] $VmssName
 )
 
 
@@ -14,7 +14,7 @@ if (!$vmss) {
   Write-Error "Could not find $VmssName in resource group: $ResourceGroupName" -ErrorAction Stop
 }
 
-Write-Host "Found scale set, checking for image..."
+Write-Host "Found scale set, checking for image '$ImageName'..."
 
 $image = Get-AzImage -ResourceGroupName $ResourceGroupName -ImageName $ImageName
 
@@ -38,7 +38,7 @@ Write-Host "VMSS Update Complete"
 
 # Remove old images as to not clutter
 $oldImages = Get-AzImage -ResourceGroupName $ResourceGroupName 
-              | Where-Object { $_.Name.StartsWith("agent-") -and $_.Name -ine $ImageName }
+| Where-Object { $_.Name.StartsWith("agent-") -and $_.Name -ine $ImageName }
 
 foreach ($oldImage in $oldImages) {
   Write-Host "Removing old image: $($oldImage.Name)"
