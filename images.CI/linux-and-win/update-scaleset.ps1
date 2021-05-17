@@ -42,5 +42,5 @@ $oldImages = Get-AzImage -ResourceGroupName $ResourceGroupName
 
 foreach ($oldImage in $oldImages) {
   Write-Host "Removing old image: $($oldImage.Name)"
-  $oldImage | Remove-AzImage
+  $oldImage | Remove-AzImage -Force
 }
